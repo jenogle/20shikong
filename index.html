@@ -350,8 +350,8 @@
       </select>
     </label>
 
-    <label>目前起始編號
-      <input id="codeStartInput" type="number" min="1" max="999999" value="1" />
+    <label>今日起始流水號
+      <input id="codeStartInput" type="number" min="1" max="999" value="1" />
     </label>
 
     <label>排列模式
@@ -373,7 +373,7 @@
     <button class="btn-white" onclick="printSheets()">列印並遞增編碼</button>
     <button class="btn-danger" onclick="resetCurrentPrefixCode()">重設目前類型編號</button>
 
-    <span class="hint">數字已縮小，可放進直徑 1 公分圓圈／刮膜內。</span>
+    <span class="hint">編碼會自動抓今天日期，例如 A1150624001；數字可放進直徑 1 公分圓圈。</span>
   </div>
 
   <main id="sheetContainer" class="preview"></main>
@@ -389,8 +389,15 @@
     const sheetContainer = $("sheetContainer");
     let isPrintingByButton = false;
 
+    function getDateCodePrefix(prefix = codePrefixInput.value, date = new Date()) {
+      const rocYear = String(date.getFullYear() - 1911).padStart(3, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${prefix}${rocYear}${month}${day}`;
+    }
+
     function getNextKey(prefix) {
-      return `kuji_img_header_v4_3x2_next_serial_${prefix}`;
+      return `kuji_img_header_v4_3x2_next_serial_${getDateCodePrefix(prefix)}`;
     }
 
     function getNextSerial(prefix) {
@@ -461,7 +468,7 @@
     }
 
     function formatSerial(prefix, serial) {
-      return `${prefix}${String(serial).padStart(4, "0")}`;
+      return `${getDateCodePrefix(prefix)}${String(serial).padStart(3, "0")}`;
     }
 
     function calcFontSize(rows, columns) {
@@ -587,7 +594,7 @@
 
     function resetCurrentPrefixCode() {
       const prefix = codePrefixInput.value;
-      const ok = confirm(`確定要把 ${prefix} 類型的下一個編號重設為 0001 嗎？`);
+      const ok = confirm(`確定要把今天 ${getDateCodePrefix(prefix)} 的下一個流水號重設為 001 嗎？`);
       if (!ok) return;
       setNextSerial(prefix, 1);
       codeStartInput.value = 1;
