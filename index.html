@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>刮紙產生器｜A4六等分裁切版</title>
+  <title>(20)刮-日期自動命名</title>
   <style>
     * { box-sizing: border-box; }
     :root {
@@ -396,6 +396,22 @@
       return `${prefix}${rocYear}${month}${day}`;
     }
 
+    function getTodayRocDateCode(date = new Date()) {
+      const rocYear = String(date.getFullYear() - 1911).padStart(3, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${rocYear}${month}${day}`;
+    }
+
+    function getOutputFileName() {
+      const count = Math.max(1, Math.min(999, Number(countInput.value) || 20));
+      return `(${count})刮-${getTodayRocDateCode()}`;
+    }
+
+    function updateDocumentTitle() {
+      document.title = getOutputFileName();
+    }
+
     function getNextKey(prefix) {
       return `kuji_img_header_v4_3x2_next_serial_${getDateCodePrefix(prefix)}`;
     }
@@ -578,6 +594,7 @@
 
     function generateSheets() {
       saveSettings();
+      updateDocumentTitle();
       updateColumnInputState();
       const pages = getPageCount();
       sheetContainer.innerHTML = "";
@@ -589,6 +606,7 @@
     function printSheets() {
       isPrintingByButton = true;
       generateSheets();
+      updateDocumentTitle();
       setTimeout(() => window.print(), 120);
     }
 
@@ -603,6 +621,7 @@
 
     window.addEventListener("beforeprint", () => {
       generateSheets();
+      updateDocumentTitle();
     });
 
     window.addEventListener("afterprint", () => {
